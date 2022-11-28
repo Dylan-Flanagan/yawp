@@ -1,17 +1,17 @@
-const pool = require('../lib/utils/pool.js');
-const setup = require('../data/setup.js');
+// const pool = require('../lib/utils/pool.js');
+// const setup = require('../data/setup.js');
 const request = require('supertest');
 const app = require('../lib/app');
-const UserService = require('../lib/services/UserService.js');
+// const UserService = require('../lib/services/UserService.js');
 
 // Dummy user for testing
 
-const mockUser = {
-  firstName: 'Test',
-  lastName: 'User',
-  email: 'test@example.com',
-  password: '12345',
-};
+// const mockUser = {
+//   firstName: 'Test',
+//   lastName: 'User',
+//   email: 'test@example.com',
+//   password: '12345',
+// };
 
 it('GET api/v1/restaurants should return a list of restaurants', async () => {
   const resp = await request(app).get('/api/v1/restaurants');
