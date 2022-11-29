@@ -2,16 +2,16 @@ const pool = require('../lib/utils/pool.js');
 const setup = require('../data/setup.js');
 const request = require('supertest');
 const app = require('../lib/app');
-// const UserService = require('../lib/services/UserService.js');
+const UserService = require('../lib/services/UserService.js');
 
 // Dummy user for testing
 
-// const mockUser = {
-//   firstName: 'Test',
-//   lastName: 'User',
-//   email: 'test@example.com',
-//   password: '12345',
-// };
+const mockUser = {
+  firstName: 'Test',
+  lastName: 'User',
+  email: 'test@example.com',
+  password: '12345',
+};
 
 describe('restaurant routes', () => {
   beforeEach(() => {
@@ -95,6 +95,19 @@ describe('restaurant routes', () => {
         "website": "http://www.PipsOriginal.com",
       }
     `);
+  });
+
+  it('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', async () => {
+    const agent = request.agent(app);
+    await UserService.create(mockUser);
+    await agent
+      .post('/api/v1/users/sessions')
+      .send({ email: mockUser.email, password: mockUser.password });
+    const resp = await agent
+      .post('/api/v1/restaurants/1/reviews')
+      .send({ detail: 'This is a new review' });
+    expect(resp.status).toBe(200);
+    expect(resp.body).toMatchInlineSnapshot();
   });
 
   afterAll(() => {
