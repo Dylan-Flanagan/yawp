@@ -17,7 +17,8 @@ describe('restaurant routes', () => {
   beforeEach(() => {
     return setup(pool);
   });
-  it('GET api/v1/restaurants should return a list of restaurants', async () => {
+
+  it('GET /api/v1/restaurants should return a list of restaurants', async () => {
     const resp = await request(app).get('/api/v1/restaurants');
     expect(resp.status).toBe(200);
     expect(resp.body).toMatchInlineSnapshot(`
@@ -56,6 +57,12 @@ describe('restaurant routes', () => {
             },
           ]
         `);
+  });
+
+  it('GET /api/v1/restaurants/:restId should return restaurant detail', async () => {
+    const resp = await request(app).get('/api/v1/restaurants/1');
+    expect(resp.status).toBe(200);
+    expect(resp.body).toMatchInlineSnapshot();
   });
 
   afterAll(() => {
