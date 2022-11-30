@@ -13,9 +13,28 @@ const mockUser = {
   password: '12345',
 };
 
+const registerAndLogin = async (userProps = {}) => {
+  const password = userProps.password ?? mockUser.password;
+
+  // Create an "agent" that gives us the ability to store cookies between requests in a test
+  const agent = request.agent(app);
+
+  // Create a user to sign with
+  const user = await UserService.create({ ...mockUser, ...userProps });
+
+  //...then sign in
+  const { email } = user;
+  await agent.post('/api/v1/users/sessions').send({ email, password });
+  return [agent, user];
+};
+
 describe('restaurant routes', () => {
   beforeEach(() => {
     return setup(pool);
+  });
+
+  afterAll(() => {
+    pool.end();
   });
 
   it('GET /api/v1/restaurants should return a list of restaurants', async () => {
@@ -98,19 +117,30 @@ describe('restaurant routes', () => {
   });
 
   it('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', async () => {
-    const agent = request.agent(app);
-    await UserService.create(mockUser);
-    await agent
-      .post('/api/v1/users/sessions')
-      .send({ email: mockUser.email, password: mockUser.password });
+    const [agent] = await registerAndLogin();
     const resp = await agent
       .post('/api/v1/restaurants/1/reviews')
-      .send({ detail: 'This is a new review' });
+      .send({ stars: 2, detail: 'This is a new review' });
     expect(resp.status).toBe(200);
-    expect(resp.body).toMatchInlineSnapshot();
+    expect(resp.body).toMatchInlineSnapshot(`
+      Object {
+        "detail": "This is a new review",
+        "id": "4",
+        "restaurant_id": "1",
+        "stars": 2,
+        "user_id": "4",
+      }
+    `);
   });
 
-  afterAll(() => {
-    pool.end();
+  it('DELETE /api/v1/reviews/:id should delete a review', async () => {
+    const [agent] = await registerAndLogin();
+    await agent
+      .post('/api/v1/restaurants/4/reviews')
+      .send({ stars: 2, detail: 'Delete this review' });
+    const resp = await agent
+      .delete('/api/v1/reviews/4')
+      .send({ message: 'this review is gone' });
+    expect(resp.status).toBe(200);
   });
 });
