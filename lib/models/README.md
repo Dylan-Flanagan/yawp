@@ -6,4 +6,4 @@ Models manage our data. They are responsible for the shape of our data and retri
 
 The model will then expose an interface to the rest of the application. Any other file doesn't need to concern itself with how the data is managed.
 
-If the changes that I just made don't work, I'm throwing my macbook
+If the changes that I just made don't work, I'm throwing my macbook - I am still considering it
